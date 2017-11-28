@@ -49,7 +49,7 @@ namespace Runner
             };
             menuBackground = new AnimatedSprite(3, 3)
             {
-                Position = new Vector2(0, 0)
+                Position = Vector2.Zero
             };
         }
 
@@ -65,22 +65,39 @@ namespace Runner
             backgroundMenuMusic = contentManager.Load<SoundEffect>("password");
         }
 
-        public void StartMenu(GameTime gameTime)
+        public void StartMenu(GameTime gameTime, Game1 game)
         {
             backgroundMusicInstance = backgroundMenuMusic.CreateInstance();
             if (menuMusicNotPlaying)
             {
                 backgroundMusicInstance.Volume = .4f;
+                backgroundMusicInstance.IsLooped = true;
                 backgroundMusicInstance.Play();
                 menuMusicNotPlaying = false;
             }
 
             menuBackground.Update(gameTime, Vector2.Zero, Vector2.Zero);
-            if (Keyboard.GetState().IsKeyDown(Keys.Enter))
+            if (Keyboard.GetState().IsKeyDown(Keys.A))
             {
                 backgroundMusicInstance.Stop();
                 backgroundMenuMusic.Dispose();
                 Game1.CurrentGameState = Game1.GameState.gamePlaying;
+            } else if (Keyboard.GetState().IsKeyDown(Keys.X))
+            {
+                Game1.CurrentGameState = Game1.GameState.howToPlay;
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.Y))
+            {
+                backgroundMusicInstance.Stop();
+                backgroundMenuMusic.Dispose();
+                Game1.CurrentGameState = Game1.GameState.highScore;
+            }
+            else if (Keyboard.GetState().IsKeyDown(Keys.B))
+            {
+                backgroundMusicInstance.Stop();
+                backgroundMenuMusic.Dispose();
+                game.Exit();
+      
             }
         }
         public void Update(GameTime gameTime)

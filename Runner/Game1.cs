@@ -32,7 +32,8 @@ namespace Runner
     {
         public enum GameState
         {
-            introVideoPlaying, gamePlaying, startMenu
+            introVideoPlaying, gamePlaying, startMenu, howToPlay,
+            highScore
         }
 
         VideoPlayer player;
@@ -50,10 +51,9 @@ namespace Runner
         
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
-        private MenuScreen menu = new MenuScreen();
 
-        //private Song bgMusic, menuMetal; 
-        //Extra Note: .mp3's passed through pipeline are automatically recognized as songs not effects
+        private MenuScreen menu = new MenuScreen();
+        private HowToPlay hToP = new HowToPlay();
 
         private SoundEffect bgEffect, introEffect;//16-bit wav
         private SoundEffectInstance introMusic, game1;
@@ -148,9 +148,11 @@ namespace Runner
             background0.LoadContent(this.Content, "FourTrees");
             background1.LoadContent(this.Content, "FourTrees"); //Tiles funky, placement or image?
 
-            //menu buttons
+            //menu bg and btns
             menu.LoadContent(this.Content);
 
+            //HowToPlay sprite
+            hToP.LoadContent(this.Content);
 
             //Animated Sprites & Rick::AnimatedSprites
             spookySkeleton.LoadContent(this.Content, "spooky512Sheet");
@@ -187,9 +189,12 @@ namespace Runner
             //Control Menu Sound and Video start/stops //Needs Button added along with actions
             if (currentGameState == GameState.startMenu)
             {
-                menu.StartMenu(gameTime);
+                menu.StartMenu(gameTime, this);
             }
-
+            if(currentGameState == GameState.howToPlay)
+            {
+                hToP.HowToPlayMenu(gameTime);
+            }
             //Actual Gameplay stuff starts here, function and input
             if (currentGameState == GameState.gamePlaying)
             {
@@ -259,11 +264,11 @@ namespace Runner
 
         private void TileBackground()
         {
-            if (background0.Position.X < -background0.Size.Width + 900)
+            if (background0.Position.X < -background0.Size.Width + screenWidth)
             {
                 background1.Position.X = background0.Position.X + background0.Size.Width;
             }
-            if (background1.Position.X < -background1.Size.Width + 900)
+            if (background1.Position.X < -background1.Size.Width + screenWidth)
             {
                 background0.Position.X = background1.Position.X + background1.Size.Width;
             }
@@ -294,20 +299,27 @@ namespace Runner
             {
                 menu.Draw(this.spriteBatch);
             }
-
-            //All gameplay items here needs work on rickPunching
+            if(currentGameState == GameState.howToPlay)
+            {
+                hToP.Draw(this.spriteBatch);
+            }
+            //All gameplay items
             if(currentGameState == GameState.gamePlaying)
             {
                 background0.Draw(this.spriteBatch);
                 background1.Draw(this.spriteBatch);
 
                 spookySkeleton.Draw(this.spriteBatch, RickVector);
-                if(currentKboardState.IsKeyDown(Keys.F) == true) //Needs previous keyboard state to prevent button 
+                if (currentKboardState.IsKeyDown(Keys.F) == true) //Needs previous keyboard state to prevent button 
                 {
-                    spriteBatch.Draw(punching, new Rectangle(rick.Position.ToPoint(), new Point(70, 70)),Color.White);
-                    rick.Draw(this.spriteBatch, RickVector, empty);
+                    spriteBatch.Draw(punching, new Rectangle(rick.Position.ToPoint(), new Point(70, 70)), Color.White);
                 }
-                rick.Draw(this.spriteBatch, RickVector, walking);
+                else
+                {
+                    rick.Draw(this.spriteBatch, RickVector, walking);
+                }
+
+
 
                 //Timer
                 spriteBatch.DrawString(timerFont, $"Time Remaining: {(int)totalTimeStart / 60}:{totalTimeStart % 60:00.000}", new Vector2(10, 70), //70 is inbetween Leaves of trees
@@ -320,8 +332,3 @@ namespace Runner
     }
 }
 
-/********************
- * PEBBLE DISTRIBUTION
- * MICHAEL SWENSON: 50
- * JARRED SROUFE:   50
- * ******************/
