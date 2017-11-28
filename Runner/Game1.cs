@@ -42,23 +42,26 @@ namespace Runner
 
         //Used to Switch between screens and music Works Great right now, needs to be a screenManager/Sound class 
         private static GameState currentGameState = GameState.introVideoPlaying;
-
+        public static GameState CurrentGameState
+        {
+            get { return currentGameState; }
+            set { currentGameState = value; }
+        }
+        
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
+        private MenuScreen menu = new MenuScreen();
 
         //private Song bgMusic, menuMetal; 
         //Extra Note: .mp3's passed through pipeline are automatically recognized as songs not effects
 
-        private SoundEffect bgEffect, introEffect, menuEffect; //16-bit wav
-        private SoundEffectInstance introMusic, game1, menuMusic;
+        private SoundEffect bgEffect, introEffect;//16-bit wav
+        private SoundEffectInstance introMusic, game1;
 
         private Sprite background0;
         private Sprite background1;
 
-        private Sprite startButton, exitButton, howToPlayButton, highScoreButton;
-
         private AnimatedSprite spookySkeleton;
-        private AnimatedSprite menuScreen;
 
         private SpriteFont timerFont;
 
@@ -84,7 +87,6 @@ namespace Runner
         //Controls Music start/stops
         private bool playIntroMovie = true;
         private bool songHasNotStarted = true;
-        private bool menuMusicNotPlaying = true;
 
         public Game1()
         {
@@ -109,42 +111,11 @@ namespace Runner
             background0 = new Sprite();
             background1 = new Sprite();
 
-            startButton = new Sprite
-            {
-                Position = new Vector2(157, 3),
-                Scale = .8f
-            };
-            howToPlayButton = new Sprite
-            {
-                Position = new Vector2(86, 172),
-                Scale = .8f
-            };
-            highScoreButton = new Sprite
-            {
-                Position = new Vector2(86, 358),
-                Scale = .8f
-            };
-            exitButton = new Sprite
-            {
-                Position = new Vector2(173, 529),
-                Scale = .8f
-            };
-
-
-
-
-
             //Pass Rows,Columns so we know how to split up the sprite sheet
             spookySkeleton = new AnimatedSprite(1, 8)
             {
                 //This is the starting Position, Skeleton is big so he goes off screen
                 Position = new Vector2(-300, 300)
-            };
-
-            //Position is 0,0 because image is 800x600 should fill screen
-            menuScreen = new AnimatedSprite(3,3)
-            {
-                Position = new Vector2(0,0)
             };
 
             //Has his own initialization
@@ -178,21 +149,16 @@ namespace Runner
             background1.LoadContent(this.Content, "FourTrees"); //Tiles funky, placement or image?
 
             //menu buttons
-            startButton.LoadContent(this.Content, "tStartButton");
-            exitButton.LoadContent(this.Content, "tExitButton");
-            highScoreButton.LoadContent(this.Content, "tHighScoreButton");
-            howToPlayButton.LoadContent(this.Content, "tHowToPlayButton");
+            menu.LoadContent(this.Content);
 
 
             //Animated Sprites & Rick::AnimatedSprites
             spookySkeleton.LoadContent(this.Content, "spooky512Sheet");
-            menuScreen.LoadContent(this.Content, "menuScreen");
             rick.LoadContent(this.Content);
 
             //SoundEffects used to Create SoundEffectInstances for greater sound control
             bgEffect = Content.Load<SoundEffect>("Stage4");
             introEffect = Content.Load<SoundEffect>("Metal");
-            menuEffect = Content.Load<SoundEffect>("password");
             }
 
         /// <summary>
@@ -221,7 +187,7 @@ namespace Runner
             //Control Menu Sound and Video start/stops //Needs Button added along with actions
             if (currentGameState == GameState.startMenu)
             {
-                StartMenu(gameTime);
+                menu.StartMenu(gameTime);
             }
 
             //Actual Gameplay stuff starts here, function and input
@@ -279,24 +245,6 @@ namespace Runner
             }
         }
 
-        private void StartMenu(GameTime gameTime)
-        {
-            menuMusic = menuEffect.CreateInstance();
-            if (menuMusicNotPlaying)
-            {
-                menuMusic.Volume = .4f;
-                menuMusic.Play();
-                menuMusicNotPlaying = false;
-            }
-            menuScreen.Update(gameTime, Vector2.Zero, Vector2.Zero);
-            if (Keyboard.GetState().IsKeyDown(Keys.Enter))
-            {
-                menuMusic.Stop();
-                menuEffect.Dispose();
-                currentGameState = GameState.gamePlaying;
-            }
-        }
-
         private static void TimerHandler(GameTime gameTime)
         {
             if (totalTimeStart > 0)
@@ -344,12 +292,8 @@ namespace Runner
             //Just draws the menu animation, needs buttons here
             if(currentGameState == GameState.startMenu)
             {
-                menuScreen.Draw(this.spriteBatch, Vector2.Zero);
-                startButton.Draw(this.spriteBatch);
-                howToPlayButton.Draw(this.spriteBatch);
-                highScoreButton.Draw(this.spriteBatch);
-                exitButton.Draw(this.spriteBatch);
-;            }
+                menu.Draw(this.spriteBatch);
+            }
 
             //All gameplay items here needs work on rickPunching
             if(currentGameState == GameState.gamePlaying)
