@@ -61,7 +61,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\ScoreRecords.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Icon.ico" />
   </ItemGroup>
