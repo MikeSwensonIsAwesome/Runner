@@ -88,8 +88,6 @@ namespace Runner
             }
             else if (Keyboard.GetState().IsKeyDown(Keys.Y))
             {
-                backgroundMusicInstance.Stop();
-                backgroundMenuMusic.Dispose();
                 Game1.CurrentGameState = Game1.GameState.highScore;
             }
             else if (Keyboard.GetState().IsKeyDown(Keys.B))

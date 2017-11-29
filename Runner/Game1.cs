@@ -54,6 +54,7 @@ namespace Runner
 
         private MenuScreen menu = new MenuScreen();
         private HowToPlay hToP = new HowToPlay();
+        private HighScore hScore = new HighScore();
 
         private SoundEffect bgEffect, introEffect;//16-bit wav
         private SoundEffectInstance introMusic, game1;
@@ -154,6 +155,9 @@ namespace Runner
             //HowToPlay sprite
             hToP.LoadContent(this.Content);
 
+            //HighScore Font Writer
+            hScore.LoadContent(this.Content);
+
             //Animated Sprites & Rick::AnimatedSprites
             spookySkeleton.LoadContent(this.Content, "spooky512Sheet");
             rick.LoadContent(this.Content);
@@ -161,6 +165,7 @@ namespace Runner
             //SoundEffects used to Create SoundEffectInstances for greater sound control
             bgEffect = Content.Load<SoundEffect>("Stage4");
             introEffect = Content.Load<SoundEffect>("Metal");
+
             }
 
         /// <summary>
@@ -195,7 +200,13 @@ namespace Runner
             {
                 hToP.HowToPlayMenu(gameTime);
             }
+            if(currentGameState == GameState.highScore)
+            {
+                hScore.HighScoreMenu(gameTime);
+            }
+
             //Actual Gameplay stuff starts here, function and input
+            //This is getting pulled out next, should make this much smaller
             if (currentGameState == GameState.gamePlaying)
             {
                 currentKboardState = Keyboard.GetState();
@@ -295,6 +306,7 @@ namespace Runner
             }
             
             //Just draws the menu animation, needs buttons here
+            //Could maybe turn these into dictionaries dictionary<State, Method>
             if(currentGameState == GameState.startMenu)
             {
                 menu.Draw(this.spriteBatch);
@@ -303,8 +315,12 @@ namespace Runner
             {
                 hToP.Draw(this.spriteBatch);
             }
+            if (currentGameState == GameState.highScore)
+            {
+                hScore.Draw(this.spriteBatch);
+            }
             //All gameplay items
-            if(currentGameState == GameState.gamePlaying)
+            if (currentGameState == GameState.gamePlaying)
             {
                 background0.Draw(this.spriteBatch);
                 background1.Draw(this.spriteBatch);
@@ -318,8 +334,6 @@ namespace Runner
                 {
                     rick.Draw(this.spriteBatch, RickVector, walking);
                 }
-
-
 
                 //Timer
                 spriteBatch.DrawString(timerFont, $"Time Remaining: {(int)totalTimeStart / 60}:{totalTimeStart % 60:00.000}", new Vector2(10, 70), //70 is inbetween Leaves of trees

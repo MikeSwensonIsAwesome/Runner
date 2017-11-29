@@ -16,8 +16,6 @@ namespace Runner
     {
         private Sprite howToPlay;
         private KeyboardState lastKBoardState;
-        private KeyboardState blankState;
-
 
         public HowToPlay()
         {
