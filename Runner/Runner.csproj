@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="AnimatedSprite.cs" />
     <Compile Include="Game1.cs" />
+    <Compile Include="GamePlayScreen.cs" />
     <Compile Include="HighScore.cs" />
     <Compile Include="HowToPlay.cs" />
     <Compile Include="MenuScreen.cs" />

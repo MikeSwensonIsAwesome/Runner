@@ -8,8 +8,8 @@
  * 
  * Last Updated 11/26/2017
  * 
- * Note: Resources are Handled using Monogames Pipeline which converts all
- * resources to .xnb files that can be built and cleaned
+ * Note: Resources that need to be built are Handled using Monogames 
+ * Pipeline which converts all resources to .xnb files that can be built and cleaned
  * ***************************************************************************/
 
 
@@ -48,33 +48,20 @@ namespace Runner
             get { return currentGameState; }
             set { currentGameState = value; }
         }
-        
+
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
         private MenuScreen menu = new MenuScreen();
         private HowToPlay hToP = new HowToPlay();
         private HighScore hScore = new HighScore();
+        private GamePlayScreen gameStarter = new GamePlayScreen();
 
         private SoundEffect bgEffect, introEffect;//16-bit wav
         private SoundEffectInstance introMusic, game1;
 
-        private Sprite background0;
-        private Sprite background1;
-
-        private AnimatedSprite spookySkeleton;
-
-        private SpriteFont timerFont;
-
         //VideoTexture is used for introVid.Draw
         private Texture2D videoTexture = null;
-
-        //Again, works in progress for Rick::Ani Sprite
-        private Texture2D punching, empty, walking;
-
-        private static float totalTimeStart = 120; //2 Min
-
-        private Rick rick;
 
         //Nice for Calculating screen positions ie screenWidth * .8 positions at 80% of screen
         private const int screenWidth = 800;
@@ -93,35 +80,12 @@ namespace Runner
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            graphics.PreferredBackBufferWidth = screenWidth;  
-            graphics.PreferredBackBufferHeight = screenHeight;  
+            graphics.PreferredBackBufferWidth = screenWidth;
+            graphics.PreferredBackBufferHeight = screenHeight;
 
             //****IMPORTANT****** Due to the way The graphicsManager displays full screen if this is on you cannot screenshot or screenrecord
             //graphics.ToggleFullScreen();
             graphics.ApplyChanges();
-        }
-
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
-        protected override void Initialize()
-        {
-            background0 = new Sprite();
-            background1 = new Sprite();
-
-            //Pass Rows,Columns so we know how to split up the sprite sheet
-            spookySkeleton = new AnimatedSprite(1, 8)
-            {
-                //This is the starting Position, Skeleton is big so he goes off screen
-                Position = new Vector2(-300, 300)
-            };
-
-            //Has his own initialization
-            rick = new Rick(1, 6);
-            base.Initialize();
         }
 
         /// <summary>
@@ -137,17 +101,9 @@ namespace Runner
             intro = Content.Load<Video>("introVid");
             player = new VideoPlayer();
 
-            //Timer Display
-            timerFont = Content.Load<SpriteFont>("Alagard"); //Gothic font
-
-            //Different Rick States, still in Progress
-            punching = Content.Load<Texture2D>("Punching");
-            empty = Content.Load<Texture2D>("EmptyCheese"); //1x1 pixel for disappearing
-            walking = Content.Load<Texture2D>("WalkRight");
-
-            //Basic Images, Moved by a Position Vector
-            background0.LoadContent(this.Content, "FourTrees");
-            background1.LoadContent(this.Content, "FourTrees"); //Tiles funky, placement or image?
+            //SoundEffects used to Create SoundEffectInstances for greater sound control
+            bgEffect = Content.Load<SoundEffect>("Stage4");
+            introEffect = Content.Load<SoundEffect>("Metal");
 
             //menu bg and btns
             menu.LoadContent(this.Content);
@@ -158,21 +114,10 @@ namespace Runner
             //HighScore Font Writer
             hScore.LoadContent(this.Content);
 
-            //Animated Sprites & Rick::AnimatedSprites
-            spookySkeleton.LoadContent(this.Content, "spooky512Sheet");
-            rick.LoadContent(this.Content);
+            //GameStart
+            gameStarter.LoadContent(this.Content);
 
-            //SoundEffects used to Create SoundEffectInstances for greater sound control
-            bgEffect = Content.Load<SoundEffect>("Stage4");
-            introEffect = Content.Load<SoundEffect>("Metal");
-
-            }
-
-        /// <summary>
-        /// UnloadContent will be called once per game and is the place to unload
-        /// game-specific content.
-        /// </summary>
-        protected override void UnloadContent() {}
+        }
 
         /// <summary>
         /// Allows the game to run logic such as updating the world,
@@ -196,51 +141,32 @@ namespace Runner
             {
                 menu.StartMenu(gameTime, this);
             }
-            if(currentGameState == GameState.howToPlay)
+            if (currentGameState == GameState.howToPlay)
             {
                 hToP.HowToPlayMenu(gameTime);
             }
-            if(currentGameState == GameState.highScore)
+            if (currentGameState == GameState.highScore)
             {
                 hScore.HighScoreMenu(gameTime);
             }
-
-            //Actual Gameplay stuff starts here, function and input
-            //This is getting pulled out next, should make this much smaller
             if (currentGameState == GameState.gamePlaying)
-            {
-                currentKboardState = Keyboard.GetState();
-                if (songHasNotStarted)
+
+                //Actual Gameplay stuff starts here, function and input
+                if (currentGameState == GameState.gamePlaying)
                 {
-                    game1 = bgEffect.CreateInstance();
-                    game1.Play();
-                    songHasNotStarted = false;
+                    currentKboardState = Keyboard.GetState();
+                    if (songHasNotStarted)
+                    {
+                        game1 = bgEffect.CreateInstance();
+                        game1.Play();
+                        songHasNotStarted = false;
+                    }
+                    gameStarter.GamePlayStart(gameTime);
                 }
-                //Controls Position on screen, 75 is about the skeleton's belly mouth
-                rick.Position.X = MathHelper.Clamp(rick.Position.X, 75, 749);
-
-                //Decrement timer to 0
-                TimerHandler(gameTime);
-
-                //Move attack jump rick
-                rick.Update(gameTime);
-
-                //Move background0 and background1 when they fall off screen
-                TileBackground();
-
-                //Animate Skeleton
-                spookySkeleton.Update(gameTime, Vector2.Zero, Vector2.Zero);
-
-                //Which way to move backgrounds and how fast
-                Vector2 direction = new Vector2(-1, 0);
-                Vector2 speed = new Vector2(140, 0);
-
-                background0.Position += direction * speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                background1.Position += direction * speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            }
             base.Update(gameTime);
         }
 
+        //Refactored Video and Sound could probably be it's own class
         private void IntroPlayerAndSound()
         {
             if (playIntroMovie == true)
@@ -258,30 +184,6 @@ namespace Runner
                 videoTexture = null;
                 currentGameState = GameState.startMenu;
                 introMusic.Stop();
-            }
-        }
-
-        private static void TimerHandler(GameTime gameTime)
-        {
-            if (totalTimeStart > 0)
-            {
-                totalTimeStart -= (float)gameTime.ElapsedGameTime.TotalSeconds;
-            }
-            else
-            {
-                totalTimeStart = 0;
-            }
-        }
-
-        private void TileBackground()
-        {
-            if (background0.Position.X < -background0.Size.Width + screenWidth)
-            {
-                background1.Position.X = background0.Position.X + background0.Size.Width;
-            }
-            if (background1.Position.X < -background1.Size.Width + screenWidth)
-            {
-                background0.Position.X = background1.Position.X + background1.Size.Width;
             }
         }
 
@@ -304,40 +206,31 @@ namespace Runner
                     spriteBatch.Draw(videoTexture, new Rectangle(0, 0, graphics.PreferredBackBufferWidth, graphics.PreferredBackBufferHeight), Color.White);
                 }
             }
-            
+
             //Just draws the menu animation, needs buttons here
             //Could maybe turn these into dictionaries dictionary<State, Method>
-            if(currentGameState == GameState.startMenu)
+            //Tried to turn this into a switch, it ruined animations
+            if (currentGameState == GameState.startMenu)
             {
                 menu.Draw(this.spriteBatch);
             }
-            if(currentGameState == GameState.howToPlay)
+
+            //How to Play Screen
+            if (currentGameState == GameState.howToPlay)
             {
                 hToP.Draw(this.spriteBatch);
             }
+
+            //High Score Screen
             if (currentGameState == GameState.highScore)
             {
                 hScore.Draw(this.spriteBatch);
             }
+
             //All gameplay items
             if (currentGameState == GameState.gamePlaying)
             {
-                background0.Draw(this.spriteBatch);
-                background1.Draw(this.spriteBatch);
-
-                spookySkeleton.Draw(this.spriteBatch, RickVector);
-                if (currentKboardState.IsKeyDown(Keys.F) == true) //Needs previous keyboard state to prevent button 
-                {
-                    spriteBatch.Draw(punching, new Rectangle(rick.Position.ToPoint(), new Point(70, 70)), Color.White);
-                }
-                else
-                {
-                    rick.Draw(this.spriteBatch, RickVector, walking);
-                }
-
-                //Timer
-                spriteBatch.DrawString(timerFont, $"Time Remaining: {(int)totalTimeStart / 60}:{totalTimeStart % 60:00.000}", new Vector2(10, 70), //70 is inbetween Leaves of trees
-                    Color.Yellow, 0, new Vector2(0, 0), .8f, SpriteEffects.None, 0);
+                gameStarter.Draw(this.spriteBatch);
             }
 
             spriteBatch.End();

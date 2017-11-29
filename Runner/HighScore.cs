@@ -20,18 +20,16 @@ namespace Runner
             Position = Vector2.Zero
         };
         private KeyboardState lastKBoardState;
-        private StringBuilder scores;
         private SpriteFont highScoreFont;
-        private bool readFile = true; //needs to be reinstated
+        private bool readFile = true;
         static string curFile = @"Content\ScoreRecords.txt";
-        string allFile;
-        int count;
         string highscores = File.ReadAllText(curFile);
+
         public HighScore()
         {
             ReadScoresToSB();
         }
-
+        
         private void Initialize()
         {
             ReadScoresToSB();
@@ -40,7 +38,6 @@ namespace Runner
         private StringBuilder ReadScoresToSB()
         {
             StringBuilder sb = new StringBuilder();
-
             try
             {
                 using (StreamReader reader = new StreamReader(@"Content\ScoreRecords.txt"))
