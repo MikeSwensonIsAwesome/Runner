@@ -59,17 +59,6 @@ namespace Runner
             Velocity = Vector2.Zero;
         }
 
-        //This is was an effort to merge Sprite and Animated sprite, didn't work needs deletion
-        public AnimatedSprite()
-        {
-            Rows = 1;
-            Columns = 1;
-            currentFrame = 0;
-            totalFrames = 1;
-            Velocity = Vector2.Zero;
-            Velocity = Vector2.Zero;
-        }
-
         //Changes Source size
         public float SpriteScalar
         {

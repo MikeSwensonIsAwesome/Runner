@@ -35,6 +35,8 @@ namespace Runner
         //How fast he moves back and forth
         const int RICK_SPEED = 100;
 
+
+
         //Jump speed vector modifiers
         const int MOVE_UP = -2;
         const int MOVE_DOWN = 2;
@@ -92,7 +94,7 @@ namespace Runner
 
                 if (aCurrentKeyboardState.IsKeyDown(Keys.Left) == true)
                 {
-                    speed.X = RICK_SPEED;
+                    speed.X = RICK_SPEED + 60;
                     direction.X = MOVE_LEFT;
                 }
                 else if (aCurrentKeyboardState.IsKeyDown(Keys.Right) == true)
@@ -114,7 +116,6 @@ namespace Runner
                 if (currentState == State.Attacking)
                 {
                     currentState = State.Walking;
-                    RICK_SPRITE = "WalkRight"; //this doesn't really work, I think it might need it's own draw
                 }
         }
         private void UpdateJump(KeyboardState currentKeyboardState)
@@ -148,7 +149,6 @@ namespace Runner
             {
                 currentState = State.Attacking;
                 startingPos = Position;
-                RICK_SPRITE = "Punching"; //Based on jumping, doesn't really work
             }
         }
 
@@ -158,7 +158,7 @@ namespace Runner
             {
                 currentState = State.Jumping;
                 startingPos = Position;
-                direction.Y = MOVE_UP;
+                direction.Y =  MOVE_UP;
                 speed = new Vector2(RICK_SPEED, RICK_SPEED);
             }
         }

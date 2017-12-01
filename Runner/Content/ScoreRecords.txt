@@ -1,8 +1,9 @@
-DateTime here, Collisions Here
-DateTime here, Collisions Here
-DateTime here, Collisions Here
-DateTime here, Collisions Here
-DateTime here, Collisions Here
-DateTime here, Collisions Here
-DateTime here, Collisions Here
-
+10/9/2009 9:45:09 PM, 17
+10/9/2009 9:45:09 PM, 7
+10/9/2009 9:45:09 PM, 7
+10/9/2009 9:45:09 PM, 6
+10/9/2009 9:45:09 PM, 5
+10/9/2009 9:45:09 PM, 4
+10/9/2009 9:45:09 PM, 3
+10/9/2009 9:45:09 PM, 2
+10/9/2009 9:45:09 PM, 1

@@ -24,27 +24,25 @@ namespace Runner
         private bool readFile = true;
         static string curFile = @"Content\ScoreRecords.txt";
         string highscores = File.ReadAllText(curFile);
+        private IList<string> backupScores = new List<string>();
+        private IList<Record> tokenedList = new List<Record>();
 
-        public HighScore()
-        {
-            ReadScoresToSB();
-        }
-        
         private void Initialize()
         {
             ReadScoresToSB();
+            RecordsToDisplay();
         }
 
-        private StringBuilder ReadScoresToSB()
+        private void ReadScoresToSB()
         {
-            StringBuilder sb = new StringBuilder();
             try
             {
                 using (StreamReader reader = new StreamReader(@"Content\ScoreRecords.txt"))
                 {
                     do
                     {
-                        sb.AppendLine(reader.ReadLine());
+                        string line = reader.ReadLine();
+                        backupScores.Add(line + Environment.NewLine);
                     } while (!reader.EndOfStream || reader.ReadLine() != null);
                 }
             }
@@ -53,7 +51,6 @@ namespace Runner
                 Console.WriteLine("High Score Reader failure");
                 Console.WriteLine(ex.Message);
             }
-            return sb;
         }
 
         public void HighScoreMenu(GameTime gameTime)
@@ -80,11 +77,40 @@ namespace Runner
             highScoreFont = contentManager.Load<SpriteFont>("Alagard"); //Gothic font
             highScore.LoadContent(contentManager, "scoreScreenBg");
         }
+        private string TextToDisplay()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (string s in backupScores)
+            {
+                sb.Append(s);
+            }
+            return sb.ToString();
+        }
+        private string RecordsToText()
+        {
+            IEnumerable<Record> results =
+                (from a in tokenedList
+                 select a).OrderByDescending(x => x.Collisions);
+            StringBuilder sb = new StringBuilder();
+            foreach (Record s in results)
+            {
+                sb.AppendLine(s.ToString());
+            }
+            return sb.ToString();
+        }
+        private void RecordsToDisplay()
+        {
+            foreach (string s in backupScores)
+            {
+                string[] tokenHolder = s.Split(',');
+                tokenedList.Add(new Record(tokenHolder[0], Convert.ToInt32(tokenHolder[1])));
+            }
+        }
 
         public void Draw(SpriteBatch spriteBatch)
         {
             highScore.Draw(spriteBatch);
-            spriteBatch.DrawString(highScoreFont, $"High Scores\n\n{ReadScoresToSB().ToString()}", new Vector2(208, 59),
+            spriteBatch.DrawString(highScoreFont, $"High Scores\n\n{RecordsToText()}", new Vector2(208, 59),
                 Color.Gold, 0, new Vector2(0, 0), .8f, SpriteEffects.None, 0);
         }
     }

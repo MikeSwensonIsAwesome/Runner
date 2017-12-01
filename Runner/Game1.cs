@@ -42,7 +42,7 @@ namespace Runner
         private KeyboardState currentKboardState;
 
         //Used to Switch between screens and music Works Great right now, needs to be a screenManager/Sound class 
-        private static GameState currentGameState = GameState.introVideoPlaying;
+        private static GameState currentGameState = GameState.startMenu;
         public static GameState CurrentGameState
         {
             get { return currentGameState; }
@@ -63,15 +63,6 @@ namespace Runner
         //VideoTexture is used for introVid.Draw
         private Texture2D videoTexture = null;
 
-        //Nice for Calculating screen positions ie screenWidth * .8 positions at 80% of screen
-        private const int screenWidth = 800;
-        private const int screenHeight = 600;
-
-        //Helps Position certain Draw Methods
-        public static int Start_X = 100;
-        public static int Start_Y = (int)(screenHeight * .7);
-        public static Vector2 RickVector = new Vector2(Start_X, Start_Y);
-
         //Controls Music start/stops
         private bool playIntroMovie = true;
         private bool songHasNotStarted = true;
@@ -80,8 +71,8 @@ namespace Runner
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
-            graphics.PreferredBackBufferWidth = screenWidth;
-            graphics.PreferredBackBufferHeight = screenHeight;
+            graphics.PreferredBackBufferWidth = 800;
+            graphics.PreferredBackBufferHeight = 600;
 
             //****IMPORTANT****** Due to the way The graphicsManager displays full screen if this is on you cannot screenshot or screenrecord
             //graphics.ToggleFullScreen();
