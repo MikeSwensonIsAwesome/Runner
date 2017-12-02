@@ -4,6 +4,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,7 +32,9 @@ namespace Runner
         //Nice for Calculating screen positions ie screenWidth * .8 positions at 80% of screen
         private const int screenWidth = 800;
         private const int screenHeight = 600;
-        private int collisions; 
+
+        private static int collisions;
+        private static int player;
 
         private static float totalTimeStart = 120; //2 Min
         private IList<Sprite> jumpObstacles = new List<Sprite>();
@@ -115,7 +118,7 @@ namespace Runner
             //Decrement timer to 0
             TimerHandler(gameTime);
 
-            if(rick.Position.X <= 75)
+            if (rick.Position.X <= 75)
             {
                 collisions++;
             }
@@ -130,7 +133,7 @@ namespace Runner
 
             background0.Position += MoveSprite(gameTime, direction, speed);
             background1.Position += MoveSprite(gameTime, direction, speed);
-            flyer.Position += MoveSprite(gameTime, direction, speed * new Vector2(2,0)) ;
+            flyer.Position += MoveSprite(gameTime, direction, speed * new Vector2(2, 0));
             for (int i = 0; i < jumpObstacles.Count; i++)
             {
                 jumpObstacles[i].Position += MoveSprite(gameTime, direction, speed);
@@ -177,8 +180,35 @@ namespace Runner
             else
             {
                 totalTimeStart = 0;
+                GameOver();
+
+                Game1.CurrentGameState = Game1.GameState.startMenu;
             }
         }
+
+        private static void GameOver()
+        {
+            player++;
+
+            try
+            {
+                string path = @"Content\ScoreRecords.txt";
+                string line = $"{player}, {collisions}";
+                using (StreamWriter writer = new StreamWriter(@"Content\ScoreRecords.txt")/*File.AppendText(path)*/)
+                {
+                    writer.WriteLine(line);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("gps Reader failure");
+                Console.WriteLine(ex.Message);
+            }
+
+            collisions = 0;
+            totalTimeStart = 120;
+        }
+
         private void TileBackground()
         {
             if (background0.Position.X < -background0.Size.Width + screenWidth)
@@ -222,6 +252,12 @@ namespace Runner
 
             spriteBatch.DrawString(timerFont, $"Collisions: {collisions}", new Vector2(700, 70), //70 is inbetween Leaves of trees
                Color.Yellow, 0, new Vector2(0, 0), .8f, SpriteEffects.None, 0);
+
+            spriteBatch.DrawString(timerFont, $"player: {player}", new Vector2(500, 40), //70 is inbetween Leaves of trees
+        Color.Yellow, 0, new Vector2(0, 0), .8f, SpriteEffects.None, 0);
+
+            spriteBatch.DrawString(timerFont, $"File Exists?: {File.Exists(@"Content\ScoreRecords.txt")}", new Vector2(600, 20), //70 is inbetween Leaves of trees
+        Color.Yellow, 0, new Vector2(0, 0), .8f, SpriteEffects.None, 0);
         }
 
     }
