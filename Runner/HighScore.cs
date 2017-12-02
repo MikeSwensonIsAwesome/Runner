@@ -15,6 +15,10 @@ namespace Runner
 {
     class HighScore
     {
+        public enum ScoreDisplays
+        {
+            PlayerAsc, PlayerDesc, CollisionAsc, CollisionDesc
+        }
         private Sprite highScore = new Sprite
         {
             Position = Vector2.Zero
@@ -26,11 +30,12 @@ namespace Runner
         string highscores = File.ReadAllText(curFile);
         private IList<string> backupScores = new List<string>();
         private IList<Record> tokenedList = new List<Record>();
+        private ScoreDisplays currentDisplay;
 
         private void Initialize()
         {
             ReadScoresToSB();
-            RecordsToDisplay();
+            RawTxtToRecordsList();
         }
 
         private void ReadScoresToSB()
@@ -63,13 +68,36 @@ namespace Runner
             }
 
             KeyboardState aCurrentKeyboardState = Keyboard.GetState();
-            //Big HEADS UP Might have to cheese it and use a Key Different than AXYB to navigate menus
-            //If you assign it B for instance it will close the game, A will start the game etc.
             if (aCurrentKeyboardState.IsKeyDown(Keys.Z) && lastKBoardState.IsKeyUp(Keys.Z))
             {
                 Game1.CurrentGameState = Game1.GameState.startMenu;
             }
+
+            aCurrentKeyboardState = ControlDisplaySort(aCurrentKeyboardState);
+
             lastKBoardState = aCurrentKeyboardState;
+        }
+
+        private KeyboardState ControlDisplaySort(KeyboardState aCurrentKeyboardState)
+        {
+            if (aCurrentKeyboardState.IsKeyDown(Keys.P) == true)
+            {
+                currentDisplay = ScoreDisplays.CollisionAsc;
+            }
+            else if (aCurrentKeyboardState.IsKeyDown(Keys.O) == true)
+            {
+                currentDisplay = ScoreDisplays.CollisionDesc;
+            }
+            else if (aCurrentKeyboardState.IsKeyDown(Keys.I) == true)
+            {
+                currentDisplay = ScoreDisplays.PlayerAsc;
+            }
+            else if (aCurrentKeyboardState.IsKeyDown(Keys.U) == true)
+            {
+                currentDisplay = ScoreDisplays.PlayerDesc;
+            }
+
+            return aCurrentKeyboardState;
         }
 
         public void LoadContent(ContentManager contentManager)
@@ -86,7 +114,7 @@ namespace Runner
             }
             return sb.ToString();
         }
-        private string RecordsToText()
+        private string DisplayCollisDesc()
         {
             IEnumerable<Record> results =
                 (from a in tokenedList
@@ -98,20 +126,79 @@ namespace Runner
             }
             return sb.ToString();
         }
-        private void RecordsToDisplay()
+
+        private string DisplayCollisAsc()
+        {
+            IEnumerable<Record> results =
+                (from a in tokenedList
+                 select a).OrderBy(x => x.Collisions);
+            StringBuilder sb = new StringBuilder();
+            foreach (Record s in results)
+            {
+                sb.AppendLine(s.ToString());
+            }
+            return sb.ToString();
+        }
+
+        private string DisplayPlayerDesc()
+        {
+            IEnumerable<Record> results =
+                (from a in tokenedList
+                 select a).OrderByDescending(x => x.Player);
+            StringBuilder sb = new StringBuilder();
+            foreach (Record s in results)
+            {
+                sb.AppendLine(s.ToString());
+            }
+            return sb.ToString();
+        }
+        private string DisplayPlayer()
+        {
+            IEnumerable<Record> results =
+                (from a in tokenedList
+                 select a).OrderBy(x => x.Player);
+            StringBuilder sb = new StringBuilder();
+            foreach (Record s in results)
+            {
+                sb.AppendLine(s.ToString());
+            }
+            return sb.ToString();
+        }
+
+
+        private void RawTxtToRecordsList()
         {
             foreach (string s in backupScores)
             {
                 string[] tokenHolder = s.Split(',');
-                tokenedList.Add(new Record(tokenHolder[0], Convert.ToInt32(tokenHolder[1])));
+                tokenedList.Add(new Record(Convert.ToInt32(tokenHolder[0]), Convert.ToInt32(tokenHolder[1])));
             }
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
+            KeyboardState currentState = Keyboard.GetState();
             highScore.Draw(spriteBatch);
-            spriteBatch.DrawString(highScoreFont, $"High Scores\n\n{RecordsToText()}", new Vector2(208, 59),
-                Color.Gold, 0, new Vector2(0, 0), .8f, SpriteEffects.None, 0);
+            if (currentDisplay == ScoreDisplays.CollisionDesc)
+            {
+                spriteBatch.DrawString(highScoreFont, $"High Scores\n\n{DisplayCollisDesc()}", new Vector2(208, 59),
+                    Color.Gold, 0, new Vector2(0, 0), .8f, SpriteEffects.None, 0);
+            } else if (currentDisplay == ScoreDisplays.CollisionAsc)
+            {
+                spriteBatch.DrawString(highScoreFont, $"High Scores\n\n{DisplayCollisAsc()}", new Vector2(208, 59),
+                    Color.Gold, 0, new Vector2(0, 0), .8f, SpriteEffects.None, 0);
+            }
+            else if (currentDisplay == ScoreDisplays.PlayerDesc)
+            {
+                spriteBatch.DrawString(highScoreFont, $"High Scores\n\n{DisplayPlayerDesc()}", new Vector2(208, 59),
+                    Color.Gold, 0, new Vector2(0, 0), .8f, SpriteEffects.None, 0);
+            }
+            else if (currentDisplay == ScoreDisplays.PlayerAsc)
+            {
+                spriteBatch.DrawString(highScoreFont, $"High Scores\n\n{DisplayPlayer()}", new Vector2(208, 59),
+                    Color.Gold, 0, new Vector2(0, 0), .8f, SpriteEffects.None, 0);
+            }
+
         }
     }
 }

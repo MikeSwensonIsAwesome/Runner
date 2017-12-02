@@ -8,33 +8,33 @@ namespace Runner
 {
     public struct Record : IComparable<Record>
     {
-        public string GameDate { get; }
+        public int Player { get; }
 
         public int Collisions { get; }
 
-        public Record(string date, int collisions)
+        public Record(int player, int collisions)
         {
-            GameDate = date;
+            Player = player;
             Collisions = collisions;
         }
 
         public override string ToString()
         {
-            return $"{GameDate.ToString()}, Collisions: {Collisions}";
+            return $"Player: {Player.ToString()}, Collisions: {Collisions}";
         }
 
         int IComparable<Record>.CompareTo(Record other)
         {
-            if(other.GameDate == other.GameDate)
+            if(other.Player == other.Player)
             {
                 return this.Collisions.CompareTo(other.Collisions); 
             }
 
-            return other.GameDate.CompareTo(this.GameDate);
+            return other.Player.CompareTo(this.Player);
         }
         public bool Equals(Record other)
         {
-            if (GameDate == other.GameDate && other.Collisions == Collisions)
+            if (Player == other.Player && other.Collisions == Collisions)
             {
                 return true;
             }
@@ -44,7 +44,7 @@ namespace Runner
         public override int GetHashCode()
         {
             int result = 17;
-            result = 31 * result + GameDate.GetHashCode();
+            result = 31 * result + Player.GetHashCode();
             result = 31 * result + (int)Collisions;
             return result;
         }

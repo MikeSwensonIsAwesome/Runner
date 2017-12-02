@@ -42,7 +42,7 @@ namespace Runner
         private KeyboardState currentKboardState;
 
         //Used to Switch between screens and music Works Great right now, needs to be a screenManager/Sound class 
-        private static GameState currentGameState = GameState.startMenu;
+        private static GameState currentGameState = GameState.introVideoPlaying;
         public static GameState CurrentGameState
         {
             get { return currentGameState; }
@@ -117,6 +117,7 @@ namespace Runner
         /// <param name="gameTime">Provides a snapshot of timing values.</param>
         protected override void Update(GameTime gameTime)
         {
+            game1 = bgEffect.CreateInstance();
             //Built in Exit via Esc or Back
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
@@ -130,7 +131,12 @@ namespace Runner
             //Control Menu Sound and Video start/stops //Needs Button added along with actions
             if (currentGameState == GameState.startMenu)
             {
+                game1.Volume = 0;
+                game1.Stop();
+                game1.Pause();
                 menu.StartMenu(gameTime, this);
+                game1.Volume = 0;
+
             }
             if (currentGameState == GameState.howToPlay)
             {
@@ -140,20 +146,20 @@ namespace Runner
             {
                 hScore.HighScoreMenu(gameTime);
             }
-            if (currentGameState == GameState.gamePlaying)
 
-                //Actual Gameplay stuff starts here, function and input
-                if (currentGameState == GameState.gamePlaying)
+            //Actual Gameplay stuff starts here, function and input
+            if (currentGameState == GameState.gamePlaying)
+            {
+                currentKboardState = Keyboard.GetState();
+                if (songHasNotStarted)
                 {
-                    currentKboardState = Keyboard.GetState();
-                    if (songHasNotStarted)
-                    {
-                        game1 = bgEffect.CreateInstance();
-                        game1.Play();
-                        songHasNotStarted = false;
-                    }
-                    gameStarter.GamePlayStart(gameTime);
+                    //game1 = bgEffect.CreateInstance();
+                    game1.Volume = .4f;
+                    game1.Play();
+                    songHasNotStarted = false;
                 }
+                gameStarter.GamePlayStart(gameTime);
+            }
             base.Update(gameTime);
         }
 
