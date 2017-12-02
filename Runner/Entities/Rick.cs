@@ -20,7 +20,7 @@ using System.Threading.Tasks;
 
 namespace Runner
 {
-    class Rick : AnimatedSprite
+    class Rick : AnimatedSprite, IEntity
     {   
         //AnimatedSprite Parameters
         public Rick(int rows, int columns) : base(rows, columns){ }
@@ -35,6 +35,15 @@ namespace Runner
         //How fast he moves back and forth
         const int RICK_SPEED = 100;
 
+        //Properties for IEntity collision
+        public Team Team { get; }
+        Vector2 IEntity.Position
+        {
+            get
+            {
+                return Position;
+            }
+        }
 
 
         //Jump speed vector modifiers
@@ -61,6 +70,8 @@ namespace Runner
         KeyboardState lastKBoardState;
 
         Vector2 startingPos = Vector2.Zero;
+
+        
 
         //Always starts at startposx and startposy
         public void LoadContent(ContentManager contentManager)
@@ -160,6 +171,17 @@ namespace Runner
                 startingPos = Position;
                 direction.Y =  MOVE_UP;
                 speed = new Vector2(RICK_SPEED, RICK_SPEED);
+            }
+        }
+
+        public void OnCollision(IEntity entity)
+        {
+            // Ignore collisions with your own arm, projectiles if we decide on doing those, etc
+            if (entity.Team == this.Team)
+                return;
+            else
+            {
+
             }
         }
     }
