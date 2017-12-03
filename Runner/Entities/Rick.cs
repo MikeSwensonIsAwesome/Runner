@@ -2,7 +2,7 @@
  *  Uses the animation tools defined by
  *  AnimatedSprite.cs and adds additional update
  *  functionality allowing "rick" to move,jump, and attack
- *  based on keyboard input.
+ *  based on controller input.
  *  
  *  Author: Michael Swenson
  *  *************************************/
@@ -24,6 +24,8 @@ namespace Runner
     {   
         //AnimatedSprite Parameters
         public Rick(int rows, int columns) : base(rows, columns){ }
+
+        GamePadState lastGamePadState = GamePad.GetState(PlayerIndex.One);
 
         //Default Is walking
         public string RICK_SPRITE = "WalkRight";
@@ -66,9 +68,6 @@ namespace Runner
         Vector2 direction = Vector2.Zero;
         Vector2 speed = Vector2.Zero;
 
-        //Used for preventing Holding button
-        KeyboardState lastKBoardState;
-
         Vector2 startingPos = Vector2.Zero;
 
         
@@ -83,43 +82,43 @@ namespace Runner
         //Gets called in Game1 update, moves the player, jumps, attacks
         public void Update(GameTime gameTime)
         {
-            KeyboardState aCurrentKeyboardState = Keyboard.GetState();
+            GamePadState currentGamePadState = GamePad.GetState(PlayerIndex.One);
 
-            UpdateMovement(aCurrentKeyboardState);
+            UpdateMovement(currentGamePadState);
 
-            UpdateJump(aCurrentKeyboardState);
+            UpdateJump(currentGamePadState);
 
-            UpdateAttack(aCurrentKeyboardState);
+            UpdateAttack(currentGamePadState);
 
-            lastKBoardState = aCurrentKeyboardState;
+            lastGamePadState = currentGamePadState;
 
             base.Update(gameTime, speed, direction);
         }
 
-        private void UpdateMovement(KeyboardState aCurrentKeyboardState)
+        private void UpdateMovement(GamePadState currentGamePad)
         {
             if (currentState == State.Walking)
             {
                 speed = Vector2.Zero;
                 direction = Vector2.Zero;
 
-                if (aCurrentKeyboardState.IsKeyDown(Keys.Left) == true)
+                if (currentGamePad.DPad.Left == ButtonState.Pressed)
                 {
                     speed.X = RICK_SPEED + 60;
                     direction.X = MOVE_LEFT;
                 }
-                else if (aCurrentKeyboardState.IsKeyDown(Keys.Right) == true)
+                else if (currentGamePad.DPad.Right == ButtonState.Pressed)
                 {
                     speed.X = RICK_SPEED;
                     direction.X = MOVE_RIGHT;
                 }
             }
         }
-        private void UpdateAttack(KeyboardState currentKeyboardState)
+        private void UpdateAttack(GamePadState currentGamePadState)
         {
             if (currentState == State.Walking)
             {
-                if (currentKeyboardState.IsKeyDown(Keys.F) == true && lastKBoardState.IsKeyDown(Keys.F) == false)
+                if (currentGamePadState.Buttons.X == ButtonState.Pressed && lastGamePadState.Buttons.X == ButtonState.Released)
                 {
                     Attack();
                 }
@@ -129,11 +128,11 @@ namespace Runner
                     currentState = State.Walking;
                 }
         }
-        private void UpdateJump(KeyboardState currentKeyboardState)
+        private void UpdateJump(GamePadState currentGamePadState)
         {
             if (currentState == State.Walking)
             {
-                if (currentKeyboardState.IsKeyDown(Keys.Space) == true && lastKBoardState.IsKeyDown(Keys.Space) == false)
+                if (currentGamePadState.Buttons.A == ButtonState.Pressed && lastGamePadState.Buttons.A == ButtonState.Released)
                 {
                     Jump(); // Loooks like /\ instead of ∩
                 }

@@ -19,7 +19,7 @@ using System.Threading.Tasks;
 
 namespace Runner
 {
-    class Sprite
+    class Sprite : IEntity
     {
         //Where the sprite is
         public Vector2 Position = new Vector2(0, 0);
@@ -60,6 +60,10 @@ namespace Runner
             }
         }
 
+        Vector2 IEntity.Position => Position;
+
+        public Team Team { get; }
+
         //Load the texture for the sprite using the Content Pipeline
         public void LoadContent(ContentManager theContentManager, string theAssetName)
         {
@@ -82,6 +86,27 @@ namespace Runner
                 Color.White, 0.0f, Vector2.Zero, Scale, SpriteEffects.None, 0);
         }
 
+        /// <summary>
+        /// Mikes attempt at implementing Ientity
+        /// </summary>
+        /// <param name="entity"></param>
+        public void OnCollision(IEntity entity)
+        {
+            if (entity.Team == this.Team)
+            {
+                return;
+            }
+            else if (entity.Team == Team.Background)
+            {
+                return;
+            } else if(entity.Team == Team.Neutral)
+            {
+                return;
+            } else if(entity.Team == Team.Enemy)
+            {
+                GamePlayScreen.collisions++;
+            }
+        }
     }
 }
 

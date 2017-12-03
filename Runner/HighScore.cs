@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace Runner
 {
-    class HighScore
+    class HighScore 
     {
         public enum ScoreDisplays
         {
@@ -23,14 +23,16 @@ namespace Runner
         {
             Position = Vector2.Zero
         };
-        private KeyboardState lastKBoardState;
+        private GamePadState lastGamePadState = GamePad.GetState(PlayerIndex.One);
+
         private SpriteFont highScoreFont;
-        private bool readFile = true;
+        internal static bool readFile = true;
+        public static bool ReadFile { get { return ReadFile; } set { readFile = value; } }
         static string curFile = @"Content\ScoreRecords.txt";
         string highscores = File.ReadAllText(curFile);
         private IList<string> backupScores = new List<string>();
         private IList<Record> tokenedList = new List<Record>();
-        private ScoreDisplays currentDisplay;
+        private ScoreDisplays currentDisplay = ScoreDisplays.CollisionDesc;
 
         private void Initialize()
         {
@@ -40,6 +42,8 @@ namespace Runner
 
         private void ReadScoresToSB()
         {
+            backupScores.Clear();
+            tokenedList.Clear();
             try
             {
                 using (StreamReader reader = new StreamReader(@"Content\ScoreRecords.txt"))
@@ -68,36 +72,38 @@ namespace Runner
             }
 
             KeyboardState aCurrentKeyboardState = Keyboard.GetState();
-            if (aCurrentKeyboardState.IsKeyDown(Keys.Z) && lastKBoardState.IsKeyUp(Keys.Z))
+            GamePadState currentGamePadState = GamePad.GetState(PlayerIndex.One);
+
+            if (currentGamePadState.Buttons.RightShoulder == ButtonState.Pressed && lastGamePadState.Buttons.RightShoulder == ButtonState.Released)
             {
                 Game1.CurrentGameState = Game1.GameState.startMenu;
             }
 
-            aCurrentKeyboardState = ControlDisplaySort(aCurrentKeyboardState);
+            currentGamePadState = ControlDisplaySort(currentGamePadState);
 
-            lastKBoardState = aCurrentKeyboardState;
+            lastGamePadState = currentGamePadState;
         }
 
-        private KeyboardState ControlDisplaySort(KeyboardState aCurrentKeyboardState)
+        private GamePadState ControlDisplaySort(GamePadState currentGamePadState)
         {
-            if (aCurrentKeyboardState.IsKeyDown(Keys.P) == true)
+            if (currentGamePadState.DPad.Up == ButtonState.Pressed)
             {
                 currentDisplay = ScoreDisplays.CollisionAsc;
             }
-            else if (aCurrentKeyboardState.IsKeyDown(Keys.O) == true)
+            else if (currentGamePadState.DPad.Down == ButtonState.Pressed)
             {
                 currentDisplay = ScoreDisplays.CollisionDesc;
             }
-            else if (aCurrentKeyboardState.IsKeyDown(Keys.I) == true)
+            else if (currentGamePadState.Buttons.LeftShoulder == ButtonState.Pressed)
             {
                 currentDisplay = ScoreDisplays.PlayerAsc;
             }
-            else if (aCurrentKeyboardState.IsKeyDown(Keys.U) == true)
+            else if (currentGamePadState.Buttons.LeftStick == ButtonState.Pressed)
             {
                 currentDisplay = ScoreDisplays.PlayerDesc;
             }
 
-            return aCurrentKeyboardState;
+            return currentGamePadState;
         }
 
         public void LoadContent(ContentManager contentManager)

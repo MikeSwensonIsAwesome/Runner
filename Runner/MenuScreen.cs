@@ -77,20 +77,20 @@ namespace Runner
             }
 
             menuBackground.Update(gameTime, Vector2.Zero, Vector2.Zero);
-            if (Keyboard.GetState().IsKeyDown(Keys.A))
+            if (Keyboard.GetState().IsKeyDown(Keys.A) || GamePad.GetState(PlayerIndex.One).Buttons.A == ButtonState.Pressed)
             {
                 backgroundMusicInstance.Stop();
                 backgroundMenuMusic.Dispose();
                 Game1.CurrentGameState = Game1.GameState.gamePlaying;
-            } else if (Keyboard.GetState().IsKeyDown(Keys.X))
+            } else if (Keyboard.GetState().IsKeyDown(Keys.X) || GamePad.GetState(PlayerIndex.One).Buttons.X == ButtonState.Pressed)
             {
                 Game1.CurrentGameState = Game1.GameState.howToPlay;
             }
-            else if (Keyboard.GetState().IsKeyDown(Keys.Y))
+            else if (Keyboard.GetState().IsKeyDown(Keys.Y) || GamePad.GetState(PlayerIndex.One).Buttons.Y == ButtonState.Pressed)
             {
                 Game1.CurrentGameState = Game1.GameState.highScore;
             }
-            else if (Keyboard.GetState().IsKeyDown(Keys.B))
+            else if (Keyboard.GetState().IsKeyDown(Keys.B) || GamePad.GetState(PlayerIndex.One).Buttons.B == ButtonState.Pressed)
             {
                 backgroundMusicInstance.Stop();
                 backgroundMenuMusic.Dispose();

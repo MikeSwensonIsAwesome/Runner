@@ -11,20 +11,19 @@ using System.Threading.Tasks;
 
 namespace Runner
 {
-    class GamePlayScreen
+    class GamePlayScreen 
     {
         private KeyboardState lastKBoardState;
-
+        GamePadState lastGamePadState = GamePad.GetState(PlayerIndex.One);
         private Rick rick;
 
         private Vector2 direction = new Vector2(-1, 0);
         private Vector2 speed = new Vector2(140, 0);
-
         private Sprite background0;
         private Sprite background1;
 
         private AnimatedSprite spookySkeleton;
-        private AnimatedSprite flyer; //pipelined nothing else
+        private AnimatedSprite flyer; 
         private SpriteFont timerFont;
 
         private Texture2D punching, empty, walking;
@@ -33,8 +32,8 @@ namespace Runner
         private const int screenWidth = 800;
         private const int screenHeight = 600;
 
-        private static int collisions;
-        private static int player;
+        public static int collisions;
+        private static int player = 6;
 
         private static float totalTimeStart = 120; //2 Min
         private IList<Sprite> jumpObstacles = new List<Sprite>();
@@ -115,6 +114,7 @@ namespace Runner
             //Controls Position on screen, 75 is about the skeleton's belly mouth
             rick.Position.X = MathHelper.Clamp(rick.Position.X, 75, 749);
 
+            CollisionChecker();
             //Decrement timer to 0
             TimerHandler(gameTime);
 
@@ -144,12 +144,37 @@ namespace Runner
             TileObstacles(flyer);
 
             KeyboardState currentKboardState = Keyboard.GetState();
-            if (currentKboardState.IsKeyDown(Keys.Z) && lastKBoardState.IsKeyUp(Keys.Z))
+            GamePadState currentGamePadState = GamePad.GetState(PlayerIndex.One);
+
+            if ((currentKboardState.IsKeyDown(Keys.Z) && lastKBoardState.IsKeyUp(Keys.Z)) ||
+                currentGamePadState.Buttons.RightShoulder == ButtonState.Pressed && lastGamePadState.Buttons.RightShoulder == ButtonState.Released)
             {
                 Game1.CurrentGameState = Game1.GameState.startMenu;
             }
             lastKBoardState = currentKboardState;
+            lastGamePadState = currentGamePadState;
         }
+
+        private void CollisionChecker()
+        {
+            foreach (Sprite s in jumpObstacles)
+            {
+                Rectangle rickR = new Rectangle((int)rick.Position.X, (int)rick.Position.Y, rick.Size.Width / 5, rick.Size.Height);
+                Rectangle sRect = new Rectangle((int)s.Position.X, (int)s.Position.Y, s.Size.Width, s.Size.Height);
+                Rectangle flyerR = new Rectangle((int)flyer.Position.X, (int)flyer.Position.Y, flyer.Size.Width / 3, flyer.Size.Height);
+                if (rickR.Intersects(sRect))
+                {
+                    s.Position.X = 0;
+                    collisions++;
+                }
+                if (rickR.Intersects(flyerR))
+                {
+                    flyer.Position.X = -25;
+                    collisions += 10;
+                }
+            }
+        }
+
         private void TileObstacles(Sprite sprite)
         {
             if (sprite.Position.X < -screenWidth - 25)
@@ -188,13 +213,11 @@ namespace Runner
 
         private static void GameOver()
         {
-            player++;
-
             try
             {
                 string path = @"Content\ScoreRecords.txt";
                 string line = $"{player}, {collisions}";
-                using (StreamWriter writer = new StreamWriter(@"Content\ScoreRecords.txt")/*File.AppendText(path)*/)
+                using (StreamWriter writer = new StreamWriter(path, true)/*File.AppendText(path)*/)
                 {
                     writer.WriteLine(line);
                 }
@@ -204,9 +227,11 @@ namespace Runner
                 Console.WriteLine("gps Reader failure");
                 Console.WriteLine(ex.Message);
             }
-
+            HighScore.ReadFile = true;
             collisions = 0;
             totalTimeStart = 120;
+            player++;
+
         }
 
         private void TileBackground()
@@ -223,6 +248,7 @@ namespace Runner
         public void Draw(SpriteBatch spriteBatch)
         {
             KeyboardState currentKboardState = Keyboard.GetState();
+            GamePadState currentGamePadState = GamePad.GetState(PlayerIndex.One);
 
             background0.Draw(spriteBatch);
             background1.Draw(spriteBatch);
@@ -236,7 +262,7 @@ namespace Runner
 
             spookySkeleton.Draw(spriteBatch, RickVector);
 
-            if (currentKboardState.IsKeyDown(Keys.F) == true) //Needs previous keyboard state to prevent button 
+            if (currentKboardState.IsKeyDown(Keys.F) == true || currentGamePadState.Buttons.X == ButtonState.Pressed) //Needs previous keyboard state to prevent button 
             {
                 spriteBatch.Draw(punching, new Rectangle(rick.Position.ToPoint(), new Point(70, 70)), Color.White);
             }
@@ -253,11 +279,7 @@ namespace Runner
             spriteBatch.DrawString(timerFont, $"Collisions: {collisions}", new Vector2(700, 70), //70 is inbetween Leaves of trees
                Color.Yellow, 0, new Vector2(0, 0), .8f, SpriteEffects.None, 0);
 
-            spriteBatch.DrawString(timerFont, $"player: {player}", new Vector2(500, 40), //70 is inbetween Leaves of trees
-        Color.Yellow, 0, new Vector2(0, 0), .8f, SpriteEffects.None, 0);
 
-            spriteBatch.DrawString(timerFont, $"File Exists?: {File.Exists(@"Content\ScoreRecords.txt")}", new Vector2(600, 20), //70 is inbetween Leaves of trees
-        Color.Yellow, 0, new Vector2(0, 0), .8f, SpriteEffects.None, 0);
         }
 
     }

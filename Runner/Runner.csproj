@@ -48,7 +48,7 @@
     <Compile Include="Control\InputConsolidator.cs" />
     <Compile Include="Control\KeyboardAdapter.cs" />
     <Compile Include="Game1.cs" />
-    <Compile Include="GamePlayScreen.cs" />
+    <Compile Include="Entities\GamePlayScreen.cs" />
     <Compile Include="HighScore.cs" />
     <Compile Include="HowToPlay.cs" />
     <Compile Include="Entities\IEntity.cs" />

@@ -15,7 +15,8 @@ namespace Runner
     class HowToPlay
     {
         private Sprite howToPlay;
-        private KeyboardState lastKBoardState;
+        private GamePadState lastGamePadState = GamePad.GetState(PlayerIndex.One);
+
 
         public HowToPlay()
         {
@@ -32,14 +33,12 @@ namespace Runner
 
         public void HowToPlayMenu(GameTime gameTime)
         {
-            KeyboardState aCurrentKeyboardState = Keyboard.GetState();
-            //Big HEADS UP Might have to cheese it and use a Key Different then AXYB to navigate menus
-            //If you assign it B for instance it will close the game, A will start the game etc.
-            if (aCurrentKeyboardState.IsKeyDown(Keys.Z) && lastKBoardState.IsKeyUp(Keys.Z))
+            GamePadState currentGamePadState = GamePad.GetState(PlayerIndex.One);
+            if (currentGamePadState.Buttons.RightShoulder == ButtonState.Pressed && lastGamePadState.Buttons.RightShoulder == ButtonState.Released)
             {
                 Game1.CurrentGameState = Game1.GameState.startMenu;
             }
-            lastKBoardState = aCurrentKeyboardState;
+            lastGamePadState = currentGamePadState;
         }
 
         public void LoadContent(ContentManager contentManager)

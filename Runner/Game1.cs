@@ -36,13 +36,11 @@ namespace Runner
             highScore
         }
 
-        VideoPlayer player;
-        Video intro;
-
-        private KeyboardState currentKboardState;
+        private VideoPlayer player;
+        private Video intro;
 
         //Used to Switch between screens and music Works Great right now, needs to be a screenManager/Sound class 
-        private static GameState currentGameState = GameState.introVideoPlaying;
+        private static GameState currentGameState = GameState.startMenu;
         public static GameState CurrentGameState
         {
             get { return currentGameState; }
@@ -75,7 +73,7 @@ namespace Runner
             graphics.PreferredBackBufferHeight = 600;
 
             //****IMPORTANT****** Due to the way The graphicsManager displays full screen if this is on you cannot screenshot or screenrecord
-            //graphics.ToggleFullScreen();
+            graphics.ToggleFullScreen();
             graphics.ApplyChanges();
         }
 
@@ -150,7 +148,6 @@ namespace Runner
             //Actual Gameplay stuff starts here, function and input
             if (currentGameState == GameState.gamePlaying)
             {
-                currentKboardState = Keyboard.GetState();
                 if (songHasNotStarted)
                 {
                     //game1 = bgEffect.CreateInstance();

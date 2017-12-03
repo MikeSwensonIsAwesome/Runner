@@ -41,7 +41,7 @@ namespace Runner.Control
         /// <returns></returns>
         private bool XButtonPressed(Buttons btn)
         {
-            return (Controller.Buttons.btn == ButtonState.Pressed);
+            return (Controller.Buttons.A == ButtonState.Pressed);
         }
 
     }
