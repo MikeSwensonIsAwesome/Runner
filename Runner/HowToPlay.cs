@@ -30,7 +30,10 @@ namespace Runner
                 Position = Vector2.Zero
             };
         }
-
+        /// <summary>
+        /// All Right Button Actions Navigate back to Menu
+        /// </summary>
+        /// <param name="gameTime"></param>
         public void HowToPlayMenu(GameTime gameTime)
         {
             GamePadState currentGamePadState = GamePad.GetState(PlayerIndex.One);

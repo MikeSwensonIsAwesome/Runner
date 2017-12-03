@@ -1,4 +1,13 @@
-﻿using Microsoft.Xna.Framework;
+﻿/************************************************************
+ * Everything that appears on the screen during game play
+ * is handled in this class.  Sprites, Animated Sprites, and
+ * Collision, tiling background, tiling all scrolling objects,
+ * and the speed/direction of the objects that scroll
+ * 
+ * Author: Mike Swenson, Jerrad Sroufe
+ * ************************************************************/
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
@@ -68,6 +77,7 @@ namespace Runner
             //Has his own initialization
             rick = new Rick(1, 6);
         }
+        //Load all the grabbie hands into an array, easy to check  for collision
         private IList<Sprite> PopulateJumpObs(IList<Sprite> jumpers)
         {
             for (int i = 0; i < 5; i++)
@@ -78,6 +88,7 @@ namespace Runner
             return jumpers;
         }
 
+        //Generates a random start off screen for objects that scroll off screen
         private Vector2 RandomStartPos(int y)
         {
             int randomXPos = random.Next(820, 1800) + random.Next(1, 3) * 40;
@@ -120,6 +131,7 @@ namespace Runner
 
             if (rick.Position.X <= 75)
             {
+                rick.Position.X = 85;
                 collisions++;
             }
             //Move attack jump rick
@@ -169,7 +181,7 @@ namespace Runner
                 }
                 if (rickR.Intersects(flyerR))
                 {
-                    flyer.Position.X = -25;
+                    flyer.Position.X = 1500;
                     collisions += 10;
                 }
             }
@@ -191,6 +203,7 @@ namespace Runner
             }
         }
 
+        //Speed for all jump Obstacles, base direction/speed
         private static Vector2 MoveSprite(GameTime gameTime, Vector2 direction, Vector2 speed)
         {
             return direction * speed * (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -211,6 +224,7 @@ namespace Runner
             }
         }
 
+        //Writes Player # and Collision # to file for Highscore to read, Needs to reset rick, jump, and flyer positions
         private static void GameOver()
         {
             try
@@ -230,8 +244,11 @@ namespace Runner
             HighScore.ReadFile = true;
             collisions = 0;
             totalTimeStart = 120;
-            player++;
+            MenuScreen.gameBgInstance.Dispose();
+            MenuScreen.gameBgEffect.Dispose();
+            MenuScreen.menuMusicNotPlaying = true;
 
+            player++;
         }
 
         private void TileBackground()
@@ -262,6 +279,7 @@ namespace Runner
 
             spookySkeleton.Draw(spriteBatch, RickVector);
 
+            //Draw punching rick on F or X
             if (currentKboardState.IsKeyDown(Keys.F) == true || currentGamePadState.Buttons.X == ButtonState.Pressed) //Needs previous keyboard state to prevent button 
             {
                 spriteBatch.Draw(punching, new Rectangle(rick.Position.ToPoint(), new Point(70, 70)), Color.White);
@@ -278,9 +296,6 @@ namespace Runner
 
             spriteBatch.DrawString(timerFont, $"Collisions: {collisions}", new Vector2(700, 70), //70 is inbetween Leaves of trees
                Color.Yellow, 0, new Vector2(0, 0), .8f, SpriteEffects.None, 0);
-
-
         }
-
     }
 }

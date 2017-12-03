@@ -4,7 +4,7 @@
  *  functionality allowing "rick" to move,jump, and attack
  *  based on controller input.
  *  
- *  Author: Michael Swenson
+ *  Author: Michael Swenson, Jerrad Sroufe
  *  *************************************/
 
 using Microsoft.Xna.Framework;

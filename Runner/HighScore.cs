@@ -1,4 +1,14 @@
-﻿using Microsoft.Xna.Framework;
+﻿/***********************************************
+ * This class reads in two ints from a file in the form
+ *  #,# then converts it to a struct Record List for 
+ *  the ability to sort these records based on player#
+ *  or collision# 
+ * 
+ * Author: Michael Swenson, Jerrad Sroufe
+ * 
+ * ************************************************/
+
+using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
@@ -15,6 +25,7 @@ namespace Runner
 {
     class HighScore 
     {
+        //Used to Control what is Displayed, without it only appears on key press
         public enum ScoreDisplays
         {
             PlayerAsc, PlayerDesc, CollisionAsc, CollisionDesc
@@ -26,6 +37,7 @@ namespace Runner
         private GamePadState lastGamePadState = GamePad.GetState(PlayerIndex.One);
 
         private SpriteFont highScoreFont;
+        //Needed different access so that any time you leave HowToPlay it will refresh when entered again
         internal static bool readFile = true;
         public static bool ReadFile { get { return ReadFile; } set { readFile = value; } }
         static string curFile = @"Content\ScoreRecords.txt";
@@ -40,6 +52,12 @@ namespace Runner
             RawTxtToRecordsList();
         }
 
+        /// <summary>
+        /// Reads text file from path into a 
+        /// string List, this happens during initialize.
+        /// List has to be cleared otherwise going in and out of the 
+        /// Menu leads to duplicates, could've been a set maybe?
+        /// </summary>
         private void ReadScoresToSB()
         {
             backupScores.Clear();
@@ -62,6 +80,11 @@ namespace Runner
             }
         }
 
+        /// <summary>
+        /// Read Everything into a string list, then convert to a Record list
+        /// String list is nice for debugging file reading
+        /// </summary>
+        /// <param name="gameTime"></param>
         public void HighScoreMenu(GameTime gameTime)
         {
             //Everytime we enter the Score Menu the builder scores should be updated
@@ -84,6 +107,12 @@ namespace Runner
             lastGamePadState = currentGamePadState;
         }
 
+        /// <summary>
+        /// Different button Presses Call different LINQ 
+        /// sortings and displays
+        /// </summary>
+        /// <param name="currentGamePadState"></param>
+        /// <returns></returns>
         private GamePadState ControlDisplaySort(GamePadState currentGamePadState)
         {
             if (currentGamePadState.DPad.Up == ButtonState.Pressed)
@@ -105,7 +134,11 @@ namespace Runner
 
             return currentGamePadState;
         }
-
+        
+        /// <summary>
+        /// All LoadContents are called in Game1 class
+        /// </summary>
+        /// <param name="contentManager"></param>
         public void LoadContent(ContentManager contentManager)
         {
             highScoreFont = contentManager.Load<SpriteFont>("Alagard"); //Gothic font
@@ -171,7 +204,6 @@ namespace Runner
             return sb.ToString();
         }
 
-
         private void RawTxtToRecordsList()
         {
             foreach (string s in backupScores)
@@ -185,6 +217,7 @@ namespace Runner
         {
             KeyboardState currentState = Keyboard.GetState();
             highScore.Draw(spriteBatch);
+            //After breaking other Draw method with switch just stuck with if/elseif
             if (currentDisplay == ScoreDisplays.CollisionDesc)
             {
                 spriteBatch.DrawString(highScoreFont, $"High Scores\n\n{DisplayCollisDesc()}", new Vector2(208, 59),
